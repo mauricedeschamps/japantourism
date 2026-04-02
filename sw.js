@@ -1,10 +1,9 @@
 const CACHE_NAME = 'japan-travel-picks-v1';
-const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.jpg',
-  './icon-512.jpg'
+const urlsToCache = [
+  'index.html',
+  'manifest.json',
+  'icons/icon-192.jpg',
+  'icons/icon-512.jpg'
 ];
 
 // インストール時：キャッシュ追加
