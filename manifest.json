@@ -1,23 +1,22 @@
 {
   "name": "Japan Traveler's Picks",
-  "short_name": "JTPicks",
-  "description": "Popular Japan web services for Western tourists",
-  "start_url": ".index.html",
+  "short_name": "J-Travel",
+  "description": "おすすめの日本旅行サービス",
+  "start_url": "index.html",
   "display": "standalone",
   "theme_color": "#1e1e2f",
   "background_color": "#121212",
-  "lang": "en",
   "icons": [
     {
       "src": "icons/icon-192.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/jpg",
       "purpose": "any maskable"
     },
     {
       "src": "icons/icon-512.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/jpg",
       "purpose": "any maskable"
     }
   ]
