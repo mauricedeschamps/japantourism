@@ -389,7 +389,7 @@
       sponsors.forEach(sp => {
         html += `<div class="sponsor-item"><a href="${sp.linkUrl}" target="_blank" rel="sponsored"><img src="${sp.imageUrl}" alt="${sp.alt}" loading="lazy"></a></div>`;
       });
-      html += `</div><div class="note-code">💡 画像とURLを変更するには sponsors 配列を編集</div>`;
+      html += `</div><div class="note-code">💡 Seeking sponsors スポンサー募集中</div>`;
       container.innerHTML = html;
     };
     renderSponsorBlock(topSponsorDiv);
