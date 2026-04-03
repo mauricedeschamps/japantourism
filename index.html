@@ -6,6 +6,8 @@
   <title>Japan Traveler's Picks</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e1e2f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     * {
       margin: 0;
@@ -14,7 +16,6 @@
       transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
 
-    /* ダークモード (デフォルト) */
     :root {
       --bg: #121212;
       --surface: #1e1e2f;
@@ -52,7 +53,6 @@
       padding: 1rem;
     }
 
-    /* ヘッダー */
     .header {
       display: flex;
       justify-content: space-between;
@@ -63,6 +63,7 @@
       padding-bottom: 1rem;
       border-bottom: 2px solid var(--primary);
     }
+
     h1 {
       font-size: 1.8rem;
       background: linear-gradient(135deg, var(--primary), #ffaa66);
@@ -70,10 +71,13 @@
       background-clip: text;
       color: transparent;
     }
+
     .controls {
       display: flex;
       gap: 0.8rem;
+      align-items: center;
     }
+
     button {
       background: var(--surface-light);
       border: 1px solid var(--border);
@@ -84,13 +88,22 @@
       font-weight: 500;
       font-size: 0.9rem;
     }
+
     button:hover {
       background: var(--primary);
       color: white;
       border-color: var(--primary);
     }
 
-    /* スポンサー枠 */
+    #installBtn {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    #installBtn:hover {
+      background: var(--primary-dark);
+    }
+
     .sponsor-area {
       background: var(--surface);
       border-radius: 24px;
@@ -118,11 +131,6 @@
       width: auto;
       border-radius: 12px;
     }
-    .sponsor-item a {
-      display: block;
-    }
-
-    /* サービスカードリスト */
     .service-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -160,8 +168,6 @@
       font-size: 0.85rem;
       color: var(--text-secondary);
     }
-
-    /* 詳細ページビュー */
     .detail-view {
       background: var(--surface);
       border-radius: 32px;
@@ -199,8 +205,6 @@
       border: none;
       margin-bottom: 1rem;
     }
-
-    /* フッター */
     .footer {
       margin-top: 3rem;
       padding: 1.5rem 0;
@@ -213,8 +217,6 @@
       color: var(--primary);
       text-decoration: none;
     }
-
-    /* ユーティリティ */
     .hidden {
       display: none;
     }
@@ -233,20 +235,18 @@
   <div class="header">
     <h1 data-en="Japan Traveler's Picks" data-ja="日本の旅おすすめサービス">Japan Traveler's Picks</h1>
     <div class="controls">
-      <button id="langBtn" aria-label="Switch language">日本語</button>
-      <button id="themeBtn" aria-label="Switch theme">☀️ ライト</button>
+      <button id="installBtn" style="display: none;">📲 インストール</button>
+      <button id="langBtn">日本語</button>
+      <button id="themeBtn">☀️ ライト</button>
     </div>
   </div>
 
-  <!-- 上部スポンサー -->
   <div id="topSponsor" class="sponsor-area"></div>
 
-  <!-- メイン一覧ビュー -->
   <div id="listView">
     <div id="serviceList" class="service-grid"></div>
   </div>
 
-  <!-- 詳細ビュー（初期非表示） -->
   <div id="detailView" class="detail-view hidden">
     <button id="backButton" class="back-btn">← <span data-en="Back" data-ja="戻る">Back</span></button>
     <img id="detailImg" class="detail-img" alt="">
@@ -257,7 +257,6 @@
     </a>
   </div>
 
-  <!-- 下部スポンサー -->
   <div id="bottomSponsor" class="sponsor-area"></div>
 
   <div class="footer">
@@ -268,100 +267,28 @@
 
 <script>
   // --------------------------------------------------------------
-  // データ定義： サービス一覧 (画像URL・説明は後から差し替え可)
-  // 各項目: id, name_en, name_ja, desc_en, desc_ja, imageUrl, officialUrl
-  // 画像は後で自分の画像URLに変更してください（例: "images/xxx.jpg"）
+  // サービスデータ
   // --------------------------------------------------------------
   const services = [
-    {
-      id: 1,
-      name_en: "JNTO / Travel Japan",
-      name_ja: "JNTO / 日本政府観光局",
-      desc_en: "Official Japan National Tourism Organization site. Reliable travel guides, events, multi-language support.",
-      desc_ja: "日本政府観光局公式サイト。多言語対応の信頼できる旅行ガイド、イベント情報。",
-      imageUrl: "https://placehold.co/600x400/FF7B2C/white?text=JNTO",
-      officialUrl: "https://www.japan.travel/en/"
-    },
-    {
-      id: 2,
-      name_en: "Japan Guide",
-      name_ja: "ジャパンガイド",
-      desc_en: "Comprehensive travel guide since 1996, especially popular among Western travelers.",
-      desc_ja: "1996年から続く詳細な総合旅行ガイド。西洋人旅行者に特に人気。",
-      imageUrl: "https://placehold.co/600x400/2C7AFF/white?text=Japan+Guide",
-      officialUrl: "https://www.japan-guide.com/"
-    },
-    {
-      id: 3,
-      name_en: "Time Out Tokyo",
-      name_ja: "タイムアウト東京",
-      desc_en: "Local events, restaurants, and 'what to do this weekend' from global media.",
-      desc_ja: "世界的メディアによる東京のイベント・レストラン情報。週末の過ごし方に強い。",
-      imageUrl: "https://placehold.co/600x400/FF4444/white?text=Time+Out+Tokyo",
-      officialUrl: "https://www.timeout.com/tokyo"
-    },
-    {
-      id: 4,
-      name_en: "Tokyo Cheapo",
-      name_ja: "トーキョーチーポ",
-      desc_en: "Budget travel tips, free events, and money-saving hacks for Tokyo.",
-      desc_ja: "節約旅行のヒント、無料イベント、東京のお得情報。",
-      imageUrl: "https://placehold.co/600x400/33AA33/white?text=Tokyo+Cheapo",
-      officialUrl: "https://tokyocheapo.com/"
-    },
-    {
-      id: 5,
-      name_en: "Japan Travel by NAVITIME",
-      name_ja: "NAVITIME ジャパントラベル",
-      desc_en: "Navigation app with transit routes, JR Pass info, offline Wi-Fi spots.",
-      desc_ja: "乗り換え案内、JRパス情報、オフラインWi-Fiスポット対応のナビアプリ。",
-      imageUrl: "https://placehold.co/600x400/AA66FF/white?text=NAVITIME",
-      officialUrl: "https://japantravel.navitime.com/"
-    },
-    {
-      id: 6,
-      name_en: "byFood",
-      name_ja: "byFood",
-      desc_en: "Japanese food experiences: cooking classes, market tours, and more.",
-      desc_ja: "料理教室やマーケットツアーなど日本食体験の予約プラットフォーム。",
-      imageUrl: "https://placehold.co/600x400/FF9933/white?text=byFood",
-      officialUrl: "https://byfood.com/"
-    },
-    {
-      id: 7,
-      name_en: "Klook",
-      name_ja: "Klook",
-      desc_en: "Tickets, tours, SIM cards – popular among Western tourists for activities.",
-      desc_ja: "チケット、ツアー、SIMカード予約。アクティビティ予約で西洋人人気。",
-      imageUrl: "https://placehold.co/600x400/1E88E5/white?text=Klook",
-      officialUrl: "https://www.klook.com/"
-    },
-    {
-      id: 8,
-      name_en: "Matcha",
-      name_ja: "Matcha",
-      desc_en: "Web magazine for inbound tourists featuring culture, sightseeing, and experiences.",
-      desc_ja: "訪日外国人向けに文化・観光・体験情報を発信するWebメディア。",
-      imageUrl: "https://placehold.co/600x400/66BB6A/white?text=Matcha",
-      officialUrl: "https://matcha-jp.com/en/"
-    }
+    { id: 1, name_en: "JNTO / Travel Japan", name_ja: "JNTO / 日本政府観光局", desc_en: "Official Japan National Tourism Organization site. Reliable travel guides, events, multi-language support.", desc_ja: "日本政府観光局公式サイト。多言語対応の信頼できる旅行ガイド、イベント情報。", imageUrl: "https://placehold.co/600x400/FF7B2C/white?text=JNTO", officialUrl: "https://www.japan.travel/en/" },
+    { id: 2, name_en: "Japan Guide", name_ja: "ジャパンガイド", desc_en: "Comprehensive travel guide since 1996, especially popular among Western travelers.", desc_ja: "1996年から続く詳細な総合旅行ガイド。西洋人旅行者に特に人気。", imageUrl: "https://placehold.co/600x400/2C7AFF/white?text=Japan+Guide", officialUrl: "https://www.japan-guide.com/" },
+    { id: 3, name_en: "Time Out Tokyo", name_ja: "タイムアウト東京", desc_en: "Local events, restaurants, and 'what to do this weekend' from global media.", desc_ja: "世界的メディアによる東京のイベント・レストラン情報。週末の過ごし方に強い。", imageUrl: "https://placehold.co/600x400/FF4444/white?text=Time+Out+Tokyo", officialUrl: "https://www.timeout.com/tokyo" },
+    { id: 4, name_en: "Tokyo Cheapo", name_ja: "トーキョーチーポ", desc_en: "Budget travel tips, free events, and money-saving hacks for Tokyo.", desc_ja: "節約旅行のヒント、無料イベント、東京のお得情報。", imageUrl: "https://placehold.co/600x400/33AA33/white?text=Tokyo+Cheapo", officialUrl: "https://tokyocheapo.com/" },
+    { id: 5, name_en: "Japan Travel by NAVITIME", name_ja: "NAVITIME ジャパントラベル", desc_en: "Navigation app with transit routes, JR Pass info, offline Wi-Fi spots.", desc_ja: "乗り換え案内、JRパス情報、オフラインWi-Fiスポット対応のナビアプリ。", imageUrl: "https://placehold.co/600x400/AA66FF/white?text=NAVITIME", officialUrl: "https://japantravel.navitime.com/" },
+    { id: 6, name_en: "byFood", name_ja: "byFood", desc_en: "Japanese food experiences: cooking classes, market tours, and more.", desc_ja: "料理教室やマーケットツアーなど日本食体験の予約プラットフォーム。", imageUrl: "https://placehold.co/600x400/FF9933/white?text=byFood", officialUrl: "https://byfood.com/" },
+    { id: 7, name_en: "Klook", name_ja: "Klook", desc_en: "Tickets, tours, SIM cards – popular among Western tourists for activities.", desc_ja: "チケット、ツアー、SIMカード予約。アクティビティ予約で西洋人人気。", imageUrl: "https://placehold.co/600x400/1E88E5/white?text=Klook", officialUrl: "https://www.klook.com/" },
+    { id: 8, name_en: "Matcha", name_ja: "Matcha", desc_en: "Web magazine for inbound tourists featuring culture, sightseeing, and experiences.", desc_ja: "訪日外国人向けに文化・観光・体験情報を発信するWebメディア。", imageUrl: "https://placehold.co/600x400/66BB6A/white?text=Matcha", officialUrl: "https://matcha-jp.com/en/" }
   ];
 
-  // --------------------------------------------------------------
-  // スポンサーデータ (画像URLとリンク先は後から自由に追加・変更可能)
-  // 各項目: imageUrl, linkUrl, alt
-  // --------------------------------------------------------------
+  // スポンサーデータ（自由に追加）
   let sponsors = [
-    { imageUrl: "https://www.google.co.jp/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png", linkUrl: "https://www.google.com/", alt: "Sponsor 1" },
-    { imageUrl: "https://localo.com/assets/img/definitions/what-is-google-translate.webp", linkUrl: "https://translate.google.co.jp/", alt: "Sponsor 2" }
+    { imageUrl: "https://www.google.co.jp/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png", linkUrl: "https://www.google.com/", alt: "Google" },
+    { imageUrl: "https://localo.com/assets/img/definitions/what-is-google-translate.webp", linkUrl: "https://translate.google.co.jp/", alt: "Google Translate" }
   ];
-  // スポンサー追加の簡単な案内：
-  // sponsors配列に { imageUrl: "あなたの画像URL", linkUrl: "リンク先URL", alt: "説明" } を追加するだけです。
-  // 上下両方に同じスポンサーが表示されます。
 
-  // 言語とテーマ
-  let currentLang = "en";   // 'en' or 'ja'
-  let currentTheme = "dark"; // 'dark' or 'light'
+  let currentLang = "en";
+  let currentTheme = "dark";
+  let deferredPrompt = null;
 
   // DOM 要素
   const listView = document.getElementById('listView');
@@ -374,12 +301,39 @@
   const detailLink = document.getElementById('detailLink');
   const langBtn = document.getElementById('langBtn');
   const themeBtn = document.getElementById('themeBtn');
+  const installBtn = document.getElementById('installBtn');
   const topSponsorDiv = document.getElementById('topSponsor');
   const bottomSponsorDiv = document.getElementById('bottomSponsor');
 
+  // --------------------------------------------------------------
+  // PWA インストール関連
+  // --------------------------------------------------------------
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      installBtn.style.display = 'none';
+    }
+    deferredPrompt = null;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    console.log('PWA installed');
+  });
+
+  // --------------------------------------------------------------
   // レンダリング関数
+  // --------------------------------------------------------------
   function renderSponsors() {
-    const renderSponsorBlock = (container) => {
+    const renderBlock = (container) => {
       if (!container) return;
       if (!sponsors.length) {
         container.innerHTML = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="note-code">[ Add sponsors in JS array ]</div>`;
@@ -392,11 +346,10 @@
       html += `</div><div class="note-code">💡 Seeking sponsors スポンサー募集中</div>`;
       container.innerHTML = html;
     };
-    renderSponsorBlock(topSponsorDiv);
-    renderSponsorBlock(bottomSponsorDiv);
+    renderBlock(topSponsorDiv);
+    renderBlock(bottomSponsorDiv);
   }
 
-  // サービス一覧描画
   function renderServiceList() {
     const lang = currentLang;
     serviceListDiv.innerHTML = '';
@@ -409,19 +362,24 @@
       card.innerHTML = `
         <img class="card-img" src="${service.imageUrl}" alt="${name}" loading="lazy">
         <div class="card-content">
-          <div class="card-title">${name}</div>
-          <div class="card-desc">${desc.substring(0, 80)}${desc.length > 80 ? '…' : ''}</div>
+          <div class="card-title">${escapeHtml(name)}</div>
+          <div class="card-desc">${escapeHtml(desc.substring(0, 80))}${desc.length > 80 ? '…' : ''}</div>
         </div>
       `;
-      card.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showDetail(service.id);
-      });
+      card.addEventListener('click', () => showDetail(service.id));
       serviceListDiv.appendChild(card);
     });
   }
 
-  // 詳細表示
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
   function showDetail(id) {
     const service = services.find(s => s.id === id);
     if (!service) return;
@@ -432,15 +390,11 @@
     detailTitle.innerText = title;
     detailDesc.innerText = description;
     detailLink.href = service.officialUrl;
-    // リンクテキストも言語切替対応
     const linkSpan = detailLink.querySelector('span');
-    if (linkSpan) {
-      linkSpan.innerText = (lang === 'en') ? 'Visit Official Website' : '公式サイトへ';
-    }
+    if (linkSpan) linkSpan.innerText = lang === 'en' ? 'Visit Official Website' : '公式サイトへ';
     listView.classList.add('hidden');
     detailView.classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // history 管理
     history.pushState({ view: 'detail', id: id }, '', `#detail-${id}`);
   }
 
@@ -451,34 +405,23 @@
     history.pushState({ view: 'list' }, '', '#');
   }
 
-  // 言語切り替え（全テキスト更新）
   function updateLanguage() {
     const lang = currentLang;
     langBtn.innerText = lang === 'en' ? '日本語' : 'English';
-    // ヘッダータイトル
     const h1 = document.querySelector('h1');
-    if (h1) {
-      h1.innerText = lang === 'en' ? h1.getAttribute('data-en') : h1.getAttribute('data-ja');
-    }
-    // 戻るボタンのテキスト
+    if (h1) h1.innerText = lang === 'en' ? h1.getAttribute('data-en') : h1.getAttribute('data-ja');
     const backSpan = backBtn.querySelector('span');
-    if (backSpan) {
-      backSpan.innerText = lang === 'en' ? 'Back' : '戻る';
-    }
-    // 詳細ページのリンクテキスト
+    if (backSpan) backSpan.innerText = lang === 'en' ? 'Back' : '戻る';
     const linkSpan = detailLink.querySelector('span');
     if (linkSpan && !detailView.classList.contains('hidden')) {
       linkSpan.innerText = lang === 'en' ? 'Visit Official Website' : '公式サイトへ';
     }
-    // リスト再描画
     if (!detailView.classList.contains('hidden')) {
-      // 詳細表示中なら、現在開いている詳細のテキストを更新
       const activeId = getCurrentDetailIdFromUrl();
       if (activeId) showDetail(activeId);
     } else {
       renderServiceList();
     }
-    // 全ての data-en/ja 対応要素（必要に応じて）
     document.querySelectorAll('[data-en][data-ja]').forEach(el => {
       if (!el.classList || !el.classList.contains('hidden')) {
         el.innerText = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-ja');
@@ -495,7 +438,6 @@
     return null;
   }
 
-  // テーマ切り替え
   function setTheme(theme) {
     currentTheme = theme;
     if (theme === 'light') {
@@ -512,7 +454,6 @@
     setTheme(currentTheme === 'dark' ? 'light' : 'dark');
   }
 
-  // 言語切り替え保存
   function setLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('language', lang);
@@ -523,12 +464,26 @@
     setLanguage(currentLang === 'en' ? 'ja' : 'en');
   }
 
-  // 初期化＆履歴管理
+  // --------------------------------------------------------------
+  // Service Worker 登録
+  // --------------------------------------------------------------
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('SW registered:', reg);
+      }).catch(err => {
+        console.log('SW registration failed:', err);
+      });
+    });
+  }
+
+  // --------------------------------------------------------------
+  // 初期化
+  // --------------------------------------------------------------
   function init() {
-    // テーマ復元
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) setTheme(savedTheme);
-    else setTheme('dark'); // ダークメイン
+    else setTheme('dark');
 
     const savedLang = localStorage.getItem('language');
     if (savedLang === 'ja' || savedLang === 'en') setLanguage(savedLang);
@@ -537,7 +492,6 @@
     renderSponsors();
     renderServiceList();
 
-    // ハッシュによる詳細リンク対応
     const hashId = getCurrentDetailIdFromUrl();
     if (hashId && services.find(s => s.id === hashId)) {
       showDetail(hashId);
@@ -545,15 +499,13 @@
       backToList();
     }
 
-    // イベント
     backBtn.addEventListener('click', backToList);
     langBtn.addEventListener('click', toggleLanguage);
     themeBtn.addEventListener('click', toggleTheme);
 
     window.addEventListener('popstate', (event) => {
-      if (event.state && event.state.view === 'detail') {
-        if (event.state.id) showDetail(event.state.id);
-        else backToList();
+      if (event.state && event.state.view === 'detail' && event.state.id) {
+        showDetail(event.state.id);
       } else {
         backToList();
       }
