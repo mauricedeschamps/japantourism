@@ -336,14 +336,14 @@
     const renderBlock = (container) => {
       if (!container) return;
       if (!sponsors.length) {
-        container.innerHTML = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="note-code">[ Add sponsors in JS array ]</div>`;
+        container.innerHTML = `<div class="sponsor-title">✨ SPONSORS ✨</div><div class="note-code">[ Add sponsors in JS array ]</div>`;
         return;
       }
-      let html = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="sponsor-flex">`;
+      let html = `<div class="sponsor-title">✨ SPONSORS ✨</div><div class="sponsor-flex">`;
       sponsors.forEach(sp => {
         html += `<div class="sponsor-item"><a href="${sp.linkUrl}" target="_blank" rel="sponsored"><img src="${sp.imageUrl}" alt="${sp.alt}" loading="lazy"></a></div>`;
       });
-      html += `</div><div class="note-code">💡 Seeking sponsors スポンサー募集中</div>`;
+      html += `</div><div class="note-code">💡 Seeking sponsors スポンサー募集中！</div>`;
       container.innerHTML = html;
     };
     renderBlock(topSponsorDiv);
